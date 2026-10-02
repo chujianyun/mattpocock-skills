@@ -1,6 +1,10 @@
 # Bug-fix test report
 
-Read this when first writing a repair report, including a blocked report. Replace placeholders with observed facts, keep all six sections, and repeat bug and test rows as needed. For a small fix, use short entries; sections with no activity need only a sentence. Do not invent a ticket, confirmed root cause, review, test count, timing, or successful outcome to fill the template.
+Read this when first writing a repair report, including a blocked report. For a standalone report, replace placeholders with observed facts, keep all six sections, and repeat bug and test rows as needed. For a small fix, use short entries; sections with no activity need only a sentence. Do not invent a ticket, confirmed root cause, review, test count, timing, or successful outcome to fill the template.
+
+## Caller-owned reports
+
+If a calling workflow supplies an existing report path, format and evidence layout in the repaired project, append the repair findings there. Preserve its headings and IDs instead of copying the six-section template below. Include the reproduction, tested versions, verified cause or uncertainty, changes, before/after evidence, regression results, review findings if any, and unresolved work. The naming and directory rules below apply to standalone reports only; evidence integrity, redaction and delivery checks apply in both modes.
 
 ## Files and evidence
 
@@ -83,5 +87,5 @@ Read this when first writing a repair report, including a blocked report. Replac
 
 - A passed overall conclusion requires the original symptoms to be resolved and the declared acceptance checks to pass. Missing coverage stays explicit; absence of a valid regression seam must be documented. A required check that failed, was blocked, or was not run prevents an unqualified pass. Report completion is separate from repair success.
 - Check that every reported result has real execution evidence and that counts match their stated scope. An observed before-fix failure is baseline evidence, not a failed after-fix regression test.
-- Replace all placeholders and remove unused sample rows and image blocks. Verify image files exist and decode, then inspect legibility in a Markdown preview when available. If preview tooling is unavailable, disclose that rendering remains unverified; this does not turn a passed repair test into a failed one. Check links from the report's own directory so moving the complete `bugfix-reports` folder preserves the images.
+- Replace all placeholders and remove unused sample rows and image blocks. Verify image files exist and decode, then inspect legibility in a Markdown preview when available. If preview tooling is unavailable, disclose that rendering remains unverified; this does not turn a passed repair test into a failed one. Check links from the report's own directory so moving the report directory together with its assets preserves the images.
 - Review text, images, and linked files for secrets and private data. Do not copy unrelated sample-project content into the report. Link the finished report in the final response with the actual result and remaining limitations.

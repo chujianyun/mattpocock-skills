@@ -17,6 +17,7 @@ It is especially useful on the hard ones: a bug that resists a first look, an in
 | "Where are the bottlenecks in this codebase?", no specific symptom | Not this skill. It diagnoses one known failure, it does not audit |
 | A raw bug report from someone else, not yet confirmed or written up | [triage](https://aihero.dev/skills-triage) first |
 | Throwaway code to answer a design question, not chase a defect | [prototype](https://aihero.dev/skills-prototype) |
+| Verify an implemented feature across its API and UI | [e2e-testing](https://aihero.dev/skills-e2e-testing), which can call this skill for repairs |
 | Building a planned behaviour test-first | [tdd](https://aihero.dev/skills-tdd) |
 | No good seam exists to lock the bug down | [improve-codebase-architecture](https://aihero.dev/skills-improve-codebase-architecture): this skill hands off there itself |
 
@@ -26,11 +27,13 @@ Repair tasks need a writable project directory for the report and any retained e
 
 ## The repair report
 
-Every repair task this skill handles delivers one Markdown report under the repaired project's `docs/bugfix-reports/`, including small fixes, blocked attempts, and failed verification. Multiple bugs in a task get separate entries in that report. Pure consultation produces no report, and using another development skill does not inherit this requirement.
+Every standalone repair task this skill handles delivers one Markdown report under the repaired project's `docs/bugfix-reports/`, including small fixes, blocked attempts, and failed verification. Multiple bugs in a task get separate entries in that report. Pure consultation produces no report, and using another development skill does not inherit this requirement.
 
-The report is in Chinese by default, unless you request another language. It includes task and environment details, acceptance criteria, actual test results, root causes and changes, before-and-after evidence, review findings, and outstanding acceptance work. Small fixes can use brief entries under these six headings; unused sections need only say what was not done. The agent reads the detailed template when writing the report, while collecting evidence from the start. Test counts and pass claims come from execution; a finished report can still say the repair is blocked or failed.
+When a workflow such as [e2e-testing](https://aihero.dev/skills-e2e-testing) supplies its report, the repair findings are appended there using the caller's headings and evidence layout. There is no second bugfix report. Reproduction, root cause, changes, before-and-after evidence and regression results remain required, and the caller decides feature acceptance after retesting.
 
-Screenshots live under `docs/bugfix-reports/assets/images/<report-stem>/` and appear inline through relative Markdown image paths. Keep the report and its assets together when moving or sharing the directory. There is no image-hosting dependency and no empty image directory when screenshots are absent.
+The report is in Chinese by default, unless you request another language. It includes task and environment details, acceptance criteria, actual test results, root causes and changes, before-and-after evidence, review findings, and outstanding acceptance work. For standalone reports, small fixes can use brief entries under these six headings; unused sections need only say what was not done. The agent reads the detailed template when writing the report, while collecting evidence from the start. Test counts and pass claims come from execution; a finished report can still say the repair is blocked or failed.
+
+Standalone screenshots live under `docs/bugfix-reports/assets/images/<report-stem>/` and appear inline through relative Markdown image paths. Keep the report and its assets together when moving or sharing the directory. There is no image-hosting dependency and no empty image directory when screenshots are absent.
 
 | Evidence situation | What you receive |
 | --- | --- |
