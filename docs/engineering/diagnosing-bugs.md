@@ -1,6 +1,6 @@
 ## What it does
 
-`diagnosing-bugs` runs a six-phase diagnosis on a hard bug or a performance regression: build a repro, minimise it, rank hypotheses, instrument, fix with a regression test, clean up.
+`diagnosing-bugs` runs a six-phase diagnosis on a bug or a performance regression: build a repro, minimise it, rank hypotheses, instrument, fix with a regression test, clean up.
 
 It will not let the agent form a theory until a **tight** feedback loop exists: one named command, already run once, that goes red on *this* bug and green when it is fixed. The default behaviour of a coding agent handed a bug report is to read code and guess; this skill blocks that. If no red-capable command exists, there is no Phase 2. That single gate is what the skill is for. Everything after it (bisection, hypothesis-testing, instrumentation) is mechanical once the signal exists.
 
@@ -8,7 +8,7 @@ It will not let the agent form a theory until a **tight** feedback loop exists: 
 
 Type `/diagnosing-bugs`, or the agent reaches for it on its own when a task fits: it is model-invoked, and fires on "diagnose" / "debug this" or on a report that something is broken, throwing, failing, or slow.
 
-Reach for it on the hard ones: a bug that resists a first look, an intermittent flake, a regression that crept in between two known-good states. It is heavy by design, and the wrong tool for a question you want answered in one message.
+It is especially useful on the hard ones: a bug that resists a first look, an intermittent flake, a regression that crept in between two known-good states. It is heavy by design, and the wrong tool for a question you want answered in one message.
 
 | Your situation | Where to go |
 | --- | --- |
@@ -19,6 +19,27 @@ Reach for it on the hard ones: a bug that resists a first look, an intermittent 
 | Throwaway code to answer a design question, not chase a defect | [prototype](https://aihero.dev/skills-prototype) |
 | Building a planned behaviour test-first | [tdd](https://aihero.dev/skills-tdd) |
 | No good seam exists to lock the bug down | [improve-codebase-architecture](https://aihero.dev/skills-improve-codebase-architecture): this skill hands off there itself |
+
+## Prerequisites
+
+Repair tasks need a writable project directory for the report and any retained evidence. Screenshot capture also needs access to the application and suitable browser or native-app tooling. Without capture access, the report explains the limitation and uses actual test output instead.
+
+## The repair report
+
+Every repair task this skill handles delivers one Markdown report under the repaired project's `docs/bugfix-reports/`, including small fixes, blocked attempts, and failed verification. Multiple bugs in a task get separate entries in that report. Pure consultation produces no report, and using another development skill does not inherit this requirement.
+
+The report is in Chinese by default, unless you request another language. It includes task and environment details, acceptance criteria, actual test results, root causes and changes, before-and-after evidence, review findings, and outstanding acceptance work. Test counts and pass claims come from execution; a finished report can still say the repair is blocked or failed.
+
+Screenshots live under `docs/bugfix-reports/assets/images/<report-stem>/` and appear inline through relative Markdown image paths. Keep the report and its assets together when moving or sharing the directory. There is no image-hosting dependency and no empty image directory when screenshots are absent.
+
+| Evidence situation | What you receive |
+| --- | --- |
+| A visible UI bug with application and capture access | Real captures before editing and after retesting the same scenario, with captions and capture differences explained |
+| No meaningful UI state | Actual command output, API responses, or performance measurements |
+| Before state already lost or capture tooling unavailable | Available evidence and an explicit explanation of the missing screenshot, without reverting your work to manufacture a comparison |
+| Reproduction or testing is blocked | A report recording attempts, missing prerequisites, and unverified checks |
+
+Images support the test assertions rather than replacing them. The agent checks image paths and Markdown display before delivery; if visual preview is unavailable, it discloses that verification limit. Its final response links the report and states the result and remaining blockers.
 
 ## The tight loop is the skill
 
@@ -49,7 +70,7 @@ The phases are gates, not a checklist. Each one refuses to open until something 
 | Into Phase 3 | The repro is reproduced *and* minimised: every remaining element is load-bearing |
 | Into Phase 4 | 3–5 ranked, falsifiable hypotheses exist, each stating its prediction, shown to you before any is tested |
 | Into Phase 5 | Probes map to a specific prediction, one variable at a time, every debug log tagged `[DEBUG-a4f2]`-style so cleanup is one grep |
-| Done | Original repro no longer reproduces, instrumentation gone, and the hypothesis that turned out correct is written into the commit message |
+| Done | Original repro no longer reproduces, instrumentation gone, the confirmed cause is documented, and the Markdown report is saved with verified image links and an evidence-backed conclusion |
 
 Phase 5 has an escape hatch worth knowing about. The regression test is written before the fix, but only if a **correct seam** exists for it: one where the test exercises the real bug pattern as it occurs at the call site. Where the only available seam is too shallow, the skill is told to say so rather than write a test that gives false confidence. That absence is itself the finding, and it is what routes the post-mortem to `improve-codebase-architecture`.
 
@@ -68,13 +89,16 @@ No. Only Phase 3 has a human checkpoint: the ranked hypothesis list is shown to 
 Partly, and neither skill admits it. As one reader put it: "Triage's step 3 is essentially a shallow, bounded instance of diagnosing-bugs Phase 1–2, but neither file mentions the other." Triage does a bounded "is this actually a bug, and what is the surface" pass; this skill does the thorough version. Running triage first is not wasted (its verification often gives you most of Phase 1's raw material), but expect to redo it properly here, and expect no cross-reference to tell you that.
 
 **Will the repro output it pastes leak secrets?**
-It might. The skill asks the agent to paste the invocation and its output, and to request artifacts like HAR files, log dumps, and core dumps. None of those are sanitised by instruction. [Issue #674](https://github.com/mattpocock/skills/issues/674) raises exactly this (credentials, tokens, cookies, and personal data riding along into a chat, an issue, or a PR) and proposes a redaction guardrail. It is open and unimplemented. Treat redaction as your job for now, particularly before the output goes anywhere public.
+The skill requires redaction before displaying output or saving report text, screenshots, and retained evidence. Credentials stay in environment variables, and private data must be masked without hiding the failure signal. This addresses the concern raised in [issue #674](https://github.com/mattpocock/skills/issues/674). Instructions are not an automatic secret scanner, so evidence still needs inspection. Creating a local report does not authorize publishing it.
 
 **My security scanner flagged this skill as high risk.**
 Snyk flags it, and the flag is a false positive. It is the only skill in the set that ships an executable shell script (`hitl-loop.template.sh`) alongside instructions to run it and to curl a dev server. Shipped `.sh` plus run-it instructions plus outbound HTTP is enough to trip a static scanner. The script itself is about 30 lines of `read -r -p` prompts that pause for human input. The scanner is rating the capability surface, not a proven exploit.
 
 **What happened to `/diagnose`?**
 Renamed to `/diagnosing-bugs` in v1.0.0. The old name no longer exists. Anything of yours that chains `/diagnose` (a wrapper skill, a saved prompt) needs updating.
+
+**Does it generate a Word report or require a screenshot for every bug?**
+No. It generates Markdown using a bundled report template. UI screenshots are captured when possible and embedded locally; backend bugs can use real output instead. A missing screenshot is explained rather than silently omitted or fabricated. Report delivery is mandatory for repair tasks even when images are unavailable.
 
 ## It's working if
 
@@ -84,10 +108,12 @@ Renamed to `/diagnosing-bugs` in v1.0.0. The old name no longer exists. Anything
 - You are shown a ranked list of 3–5 hypotheses, each with a prediction you could falsify, before any of them is tested.
 - Every debug log it adds carries a tag like `[DEBUG-a4f2]`, and a grep for that tag comes back empty when it declares done.
 - The commit or PR message names which hypothesis was right.
+- The final reply links a report whose results match the execution evidence, including blocked and not-run checks.
+- Its screenshots display in Markdown, correspond to named bugs and scenarios, and remain available after cleanup; any missing before or after capture is explained.
 - When it cannot lock the bug down with a test, it says so plainly instead of writing a shallow one.
 
 ## Where it fits
 
-`diagnosing-bugs` is a reach-for-it-anytime standalone. You drop into it when something is broken and drop out when the fix and its regression test are in; it holds no state and needs no prior setup. [ask-matt](https://aihero.dev/skills-ask-matt) routes "Something's broken" here.
+`diagnosing-bugs` is a reach-for-it-anytime standalone. You drop into it when something is broken and finish with a verified fix and a local test report, or a report explaining what remains blocked. It needs no prior skill setup; the report and retained evidence remain in the repaired project. [ask-matt](https://aihero.dev/skills-ask-matt) routes "Something's broken" here.
 
 Two neighbours matter. [improve-codebase-architecture](https://aihero.dev/skills-improve-codebase-architecture) takes the [handoff](https://www.aihero.dev/ai-coding-dictionary/handoff) when the real finding is that the code has no seam to lock the bug down; the recommendation is made after the fix is in, when there is more information. [triage](https://aihero.dev/skills-triage) sits upstream of it for bugs that arrive as raw reports from other people, and does a shallower version of the same first two phases.

@@ -1,11 +1,11 @@
 ---
 name: diagnosing-bugs
-description: Diagnosis loop for hard bugs and performance regressions. Use when the user says "diagnose"/"debug this", or reports something broken/throwing/failing/slow.
+description: Diagnose and fix bugs and performance regressions, delivering a Markdown test report with before-and-after evidence. Use when the user wants a bug fixed, says "diagnose"/"debug this", or reports something broken/throwing/failing/slow. Pure explanation requests do not start a repair or require a report.
 ---
 
 # Diagnosing Bugs
 
-A discipline for hard bugs. Skip phases only when explicitly justified.
+A discipline for bugs, especially hard ones. Skip phases only when explicitly justified; a small fix does not waive the report requirement.
 
 When exploring the codebase, read `GLOSSARY.md` (if it exists) to get a clear mental model of the relevant modules, and check ADRs in the area you're touching.
 
@@ -14,6 +14,16 @@ When exploring the codebase, read `GLOSSARY.md` (if it exists) to get a clear me
 This skill has you show commands, outputs and captured artifacts. **Redact every secret first**: write `<REDACTED>` in its place. Build loops against env vars, so the credential stays in the environment rather than in what you show. Captured artifacts carry auth headers: quote only the lines that carry the signal.
 
 If the redacted output is not enough to diagnose the bug, say so and ask the user.
+
+Apply the same redaction to report text, screenshots, and retained evidence files before saving them. Hide credentials and private data without hiding the failure signal; never retain an unredacted copy alongside the report.
+
+## Required repair deliverable
+
+Every bug-fix task handled by this skill delivers **one Markdown test report**, including small fixes, failed verification, and blocked repair attempts. Multiple bugs in one task share a report with separate bug IDs. Pure consultation without a repair task needs no report; this rule does not impose reporting on other skills.
+
+At the start of a repair task, read [the report template](references/test-report-template.md), choose a unique report name, and collect evidence throughout the loop. Save the report in the **project being repaired**, at `docs/bugfix-reports/<YYYYMMDD-HHmmss>-<task-slug>-测试报告.md`, in Chinese unless the user requests another language. Store any screenshots in `docs/bugfix-reports/assets/images/<report-stem>/` and embed them with Markdown paths relative to the report. Do not create an empty image directory or overwrite another task's report.
+
+The report records actual execution, not planned success. Distinguish passed, failed, blocked, and not-run checks, separate new regression checks from existing suites, and derive counts and timings only from observed output. Screenshots supplement assertions; they do not prove a test passed. If work stops early, save the evidence and blocker in the report before handing back to the user. An inaccessible output directory is a delivery blocker to disclose, not permission to claim completion.
 
 ## Phase 1: Build a feedback loop
 
@@ -54,6 +64,8 @@ The goal is not a clean repro but a **higher reproduction rate**. Loop the trigg
 
 Stop and say so explicitly. List what you tried. Ask the user for: (a) access to whatever environment reproduces it, (b) a redacted captured artifact (HAR file, log dump, core dump, screen recording with timestamps), or (c) permission to add temporary production instrumentation. Do **not** proceed to hypothesise without a loop.
 
+For a repair task, save a blocked report with the attempts and missing prerequisites before stopping. Do not label an unexecuted check as passed.
+
 ### Completion criterion: a tight loop that goes red
 
 Phase 1 is done when the loop is **tight** and **red-capable**: you can name **one command** (a script path, a test invocation, a curl) that you have **already run at least once** (show the invocation and its output, redacted), and that is:
@@ -74,6 +86,12 @@ Confirm:
 - [ ] The loop produces the failure mode the **user** described, not a different failure that happens to be nearby. Wrong bug = wrong fix.
 - [ ] The failure is reproducible across multiple runs (or, for non-deterministic bugs, reproducible at a high enough rate to debug against).
 - [ ] You have captured the exact symptom (error message, wrong output, slow timing) so later phases can verify the fix actually addresses it.
+
+### Capture before evidence
+
+Before editing the code, preserve the original failing command and its actual output. For a visible UI bug, capture the failing state when the application is accessible and screenshot tooling is available. Note the steps, test data, role, viewport, and tested revision or working-tree state so the same scenario can be repeated after the fix. Use an available browser or native-app capture tool appropriate to the application.
+
+For API, CLI, or performance bugs without a meaningful visual state, retain real responses, output, or measurements instead. If a screenshot is inapplicable, tooling is unavailable, or the before state was already lost, explain that in the report. Never fabricate a screenshot or revert user work to recreate one.
 
 ### Minimise
 
@@ -127,6 +145,8 @@ If a correct seam exists:
 4. Watch it pass.
 5. Re-run the Phase 1 feedback loop against the original (un-minimised) scenario.
 
+Record the actual after results, including failures. For UI bugs with capture access, take an after screenshot using the same scenario, data, role, and viewport where possible; disclose material differences. Pair it with the before evidence under the same bug ID. A missing before screenshot does not prevent collecting useful after evidence.
+
 ## Phase 6: Cleanup
 
 Required before declaring done:
@@ -134,5 +154,9 @@ Required before declaring done:
 - [ ] Original repro no longer reproduces (re-run the Phase 1 loop)
 - [ ] Regression test passes (or absence of seam is documented)
 - [ ] All `[DEBUG-...]` instrumentation removed (`grep` the prefix)
-- [ ] Throwaway prototypes deleted (or moved to a clearly-marked debug location)
+- [ ] Throwaway prototypes deleted (or moved to a clearly-marked debug location), with report evidence preserved
 - [ ] The hypothesis that turned out correct is stated in the commit / PR message, so the next debugger learns
+- [ ] The task's Markdown report is saved, its conclusion matches the observed results, and missing screenshots or regression coverage are explained
+- [ ] Every embedded image resolves relative to the report, opens successfully, and displays legibly in a Markdown preview; no secrets or private data remain in the deliverable
+
+Do not declare delivery complete without the report or with broken image links. If preview tooling is unavailable, check paths and image decoding, disclose that visual verification is incomplete, and do not claim the preview was verified. In the final response, link the report and state the verification conclusion and any remaining blockers. Report files and evidence are local deliverables; this skill does not authorize publishing them.

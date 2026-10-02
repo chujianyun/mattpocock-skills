@@ -1,3 +1,3 @@
 interface:
   display_name: "Diagnosing Bugs"
-  short_description: "Diagnose hard bugs and regressions"
+  short_description: "Fix bugs with Markdown reports and visual evidence"
