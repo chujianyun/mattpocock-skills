@@ -1,6 +1,6 @@
 ---
 name: diagnosing-bugs
-description: Diagnose and fix bugs and performance regressions, delivering a Markdown test report with before-and-after evidence. Use when the user wants a bug fixed, says "diagnose"/"debug this", or reports something broken/throwing/failing/slow. Pure explanation requests do not start a repair or require a report.
+description: Diagnose bugs and performance regressions; deliver Markdown reports for repair tasks. Use for requests to debug or fix a specific failure, not general code explanations or proactive audits.
 ---
 
 # Diagnosing Bugs
@@ -21,7 +21,7 @@ Apply the same redaction to report text, screenshots, and retained evidence file
 
 Every bug-fix task handled by this skill delivers **one Markdown test report**, including small fixes, failed verification, and blocked repair attempts. Multiple bugs in one task share a report with separate bug IDs. Pure consultation without a repair task needs no report; this rule does not impose reporting on other skills.
 
-At the start of a repair task, read [the report template](references/test-report-template.md), choose a unique report name, and collect evidence throughout the loop. Save the report in the **project being repaired**, at `docs/bugfix-reports/<YYYYMMDD-HHmmss>-<task-slug>-测试报告.md`, in Chinese unless the user requests another language. Store any screenshots in `docs/bugfix-reports/assets/images/<report-stem>/` and embed them with Markdown paths relative to the report. Do not create an empty image directory or overwrite another task's report.
+At the start of a repair task, choose a unique report name and collect evidence throughout the loop. Save the report in the **project being repaired**, at `docs/bugfix-reports/<YYYYMMDD-HHmmss>-<task-slug>-测试报告.md`, in Chinese unless the user requests another language. Store any screenshots in `docs/bugfix-reports/assets/images/<report-stem>/`, where `report-stem` is the report filename without `.md`, and embed them with Markdown paths relative to the report. Do not create an empty image directory or overwrite another task's report. Read [the report template](references/test-report-template.md) when first writing the report, including when stopping early. Small fixes can use brief entries under its six headings; do not expand the work just to fill the template.
 
 The report records actual execution, not planned success. Distinguish passed, failed, blocked, and not-run checks, separate new regression checks from existing suites, and derive counts and timings only from observed output. Screenshots supplement assertions; they do not prove a test passed. If work stops early, save the evidence and blocker in the report before handing back to the user. An inaccessible output directory is a delivery blocker to disclose, not permission to claim completion.
 
@@ -149,14 +149,18 @@ Record the actual after results, including failures. For UI bugs with capture ac
 
 ## Phase 6: Cleanup
 
-Required before declaring done:
+For repair tasks, distinguish a verified fix from a report documenting a failed or blocked attempt. Before declaring the repair successful:
 
 - [ ] Original repro no longer reproduces (re-run the Phase 1 loop)
 - [ ] Regression test passes (or absence of seam is documented)
 - [ ] All `[DEBUG-...]` instrumentation removed (`grep` the prefix)
 - [ ] Throwaway prototypes deleted (or moved to a clearly-marked debug location), with report evidence preserved
 - [ ] The hypothesis that turned out correct is stated in the commit / PR message, so the next debugger learns
-- [ ] The task's Markdown report is saved, its conclusion matches the observed results, and missing screenshots or regression coverage are explained
-- [ ] Every embedded image resolves relative to the report, opens successfully, and displays legibly in a Markdown preview; no secrets or private data remain in the deliverable
 
-Do not declare delivery complete without the report or with broken image links. If preview tooling is unavailable, check paths and image decoding, disclose that visual verification is incomplete, and do not claim the preview was verified. In the final response, link the report and state the verification conclusion and any remaining blockers. Report files and evidence are local deliverables; this skill does not authorize publishing them.
+Before handing back any repair task, including a failed or blocked attempt:
+
+- [ ] The task's Markdown report is saved, its conclusion matches the observed results, and missing screenshots or regression coverage are explained
+- [ ] Every embedded image resolves relative to the report and decodes successfully; if a Markdown preview is available, its display has also been checked for legibility
+- [ ] Report text, images, and retained evidence have been checked for secrets and private data
+
+Do not declare report delivery complete without the report or with broken image links. If preview tooling is unavailable, deliver the path- and decode-checked report with an explicit visual-verification limitation; do not claim its rendering was verified. In the final response, link the report and state the repair result and any remaining blockers. Pure consultation does not enter this repair-delivery checklist. Report files and evidence are local deliverables; this skill does not authorize publishing them.

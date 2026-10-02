@@ -6,7 +6,7 @@ It will not let the agent form a theory until a **tight** feedback loop exists: 
 
 ## When to reach for it
 
-Type `/diagnosing-bugs`, or the agent reaches for it on its own when a task fits: it is model-invoked, and fires on "diagnose" / "debug this" or on a report that something is broken, throwing, failing, or slow.
+Type `/diagnosing-bugs`, or the agent reaches for it on its own when a task fits: it is model-invoked, for requests to debug or fix a specific failure. General code explanations and proactive audits do not trigger it.
 
 It is especially useful on the hard ones: a bug that resists a first look, an intermittent flake, a regression that crept in between two known-good states. It is heavy by design, and the wrong tool for a question you want answered in one message.
 
@@ -28,7 +28,7 @@ Repair tasks need a writable project directory for the report and any retained e
 
 Every repair task this skill handles delivers one Markdown report under the repaired project's `docs/bugfix-reports/`, including small fixes, blocked attempts, and failed verification. Multiple bugs in a task get separate entries in that report. Pure consultation produces no report, and using another development skill does not inherit this requirement.
 
-The report is in Chinese by default, unless you request another language. It includes task and environment details, acceptance criteria, actual test results, root causes and changes, before-and-after evidence, review findings, and outstanding acceptance work. Test counts and pass claims come from execution; a finished report can still say the repair is blocked or failed.
+The report is in Chinese by default, unless you request another language. It includes task and environment details, acceptance criteria, actual test results, root causes and changes, before-and-after evidence, review findings, and outstanding acceptance work. Small fixes can use brief entries under these six headings; unused sections need only say what was not done. The agent reads the detailed template when writing the report, while collecting evidence from the start. Test counts and pass claims come from execution; a finished report can still say the repair is blocked or failed.
 
 Screenshots live under `docs/bugfix-reports/assets/images/<report-stem>/` and appear inline through relative Markdown image paths. Keep the report and its assets together when moving or sharing the directory. There is no image-hosting dependency and no empty image directory when screenshots are absent.
 
@@ -39,7 +39,7 @@ Screenshots live under `docs/bugfix-reports/assets/images/<report-stem>/` and ap
 | Before state already lost or capture tooling unavailable | Available evidence and an explicit explanation of the missing screenshot, without reverting your work to manufacture a comparison |
 | Reproduction or testing is blocked | A report recording attempts, missing prerequisites, and unverified checks |
 
-Images support the test assertions rather than replacing them. The agent checks image paths and Markdown display before delivery; if visual preview is unavailable, it discloses that verification limit. Its final response links the report and states the result and remaining blockers.
+Images support the test assertions rather than replacing them. The agent checks image paths and decoding, then inspects Markdown display when a preview is available. Without preview tooling, it delivers the report with rendering explicitly marked unverified; that limitation does not change the observed repair-test result. Its final response links the report and states the result and remaining blockers.
 
 ## The tight loop is the skill
 
