@@ -1,0 +1,35 @@
+
+Running 1 test using 1 worker
+
+  ✘  1 [chromium] › browser.spec.js:2:1 › saved note remains visible after reload (2.3s)
+
+
+  1) [chromium] › browser.spec.js:2:1 › saved note remains visible after reload ────────────────────
+
+    Error: expect(locator).toHaveText(expected) failed
+
+    Locator: getByRole('listitem')
+    Expected: "Acceptance note"
+    Timeout: 2000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toHaveText" getByRole('listitem') with timeout 2000ms
+      - waiting for getByRole('listitem')
+
+
+       7 |  expect((await saved).status()).toBe(201);
+       8 |  await page.reload();
+    >  9 |  try {await expect(page.getByRole('listitem')).toHaveText('Acceptance note',{timeout:2000});}
+         |                                                ^
+      10 |  finally {await page.screenshot({path:process.env.CAPTURE_PATH});}
+      11 | });
+      12 |
+        at <fixture>/browser.spec.js:9:48
+
+    Error Context: test-results/browser-saved-note-remains-visible-after-reload-chromium/error-context.md
+
+  1 failed
+    [chromium] › browser.spec.js:2:1 › saved note remains visible after reload ─────────────────────
+(node:71194) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)

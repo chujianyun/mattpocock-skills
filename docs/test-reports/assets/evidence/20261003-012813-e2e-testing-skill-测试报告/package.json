@@ -1,0 +1,19 @@
+{
+  "name": "e2e-skill-validation.1wbyw4",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "@playwright/test": "^1.63.0",
+    "appium": "^3.8.0",
+    "supertest": "^7.3.1",
+    "webdriverio": "^9.32.0"
+  }
+}

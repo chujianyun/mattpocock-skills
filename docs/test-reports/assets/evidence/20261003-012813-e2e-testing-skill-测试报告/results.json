@@ -1,0 +1,18 @@
+[
+  {
+    "name": "api-red",
+    "exit": 1
+  },
+  {
+    "name": "api-green",
+    "exit": 0
+  },
+  {
+    "name": "web-red",
+    "exit": 1
+  },
+  {
+    "name": "web-green",
+    "exit": 0
+  }
+]

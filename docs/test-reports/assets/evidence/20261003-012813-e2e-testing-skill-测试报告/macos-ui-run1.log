@@ -1,0 +1,7 @@
+2026-10-02T17:26:50.088Z ERROR webdriver: WebDriverError: The app representing local.e2eskill.acceptance.macos could not be found. when running "execute/sync" with method "POST"
+unknown error: WebDriverError: The app representing local.e2eskill.acceptance.macos could not be found. when running "execute/sync" with method "POST"
+    at FetchRequest._request (file://<fixture>/node_modules/webdriver/build/node.js:2316:19)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async Browser.wrapCommandFn (file://<fixture>/node_modules/@wdio/utils/build/index.js:1100:23)
+    at async Browser.wrapCommandFn (file://<fixture>/node_modules/@wdio/utils/build/index.js:1100:23)
+    at async file://<fixture>/native-validation.mjs:17:142
