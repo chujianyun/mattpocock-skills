@@ -1,6 +1,6 @@
 ## What it does
 
-`implement-spec` takes a [spec](https://www.aihero.dev/ai-coding-dictionary/spec) and its [tickets](https://www.aihero.dev/ai-coding-dictionary/ticket) and lands the whole thing in one run. The orchestrating [agent](https://www.aihero.dev/ai-coding-dictionary/agent) hands each ticket to an implementer [subagent](https://www.aihero.dev/ai-coding-dictionary/subagent) working in its own git worktree, merges each finished branch into a single **integration branch**, runs [code-review](https://aihero.dev/skills-code-review) over the result, and resolves the tickets.
+`implement-spec` takes a [spec](https://www.aihero.dev/ai-coding-dictionary/spec) and its [tickets](https://www.aihero.dev/ai-coding-dictionary/ticket) and lands the whole thing in one run. The orchestrating [agent](https://www.aihero.dev/ai-coding-dictionary/agent) hands each ticket to an implementer [subagent](https://www.aihero.dev/ai-coding-dictionary/subagent) working in its own git worktree, merges each finished branch into a single **integration branch**, verifies affected journeys with [e2e-testing](https://aihero.dev/skills-e2e-testing), and runs [code-review](https://aihero.dev/skills-code-review) over the result. Tickets close only after required verification and review findings are resolved.
 
 It reads the tickets as a **task graph**, not a list. Blocking edges decide what can start, so at any moment there is a **frontier** of tickets whose blockers have all landed, and every ticket on the frontier runs at once. That is the difference from working the tickets one by one: the graph's shape, not its order on the tracker, sets the pace.
 
@@ -29,9 +29,21 @@ Everything lands on one branch. Each implementer:
 2. builds its ticket with [tdd](https://aihero.dev/skills-tdd), red-green one slice at a time,
 3. merges the integration branch tip into its own branch before reporting done, so landing it is a fast-forward.
 
-Whether a pull request exists at all is the tracker's call. If your tracker closes work through PRs, or you ask for one, a draft PR opens after the first merge and is marked ready at the end. Otherwise the run stops on the integration branch with every ticket resolved the way your tracker closes work, which works fully offline against a local markdown tracker.
+Whether a pull request exists at all is the tracker's call. If your tracker closes work through PRs, or you ask for one, a draft PR opens after the first merge and is marked ready after required acceptance and review pass. Otherwise a successful run stops on the integration branch with every ticket resolved the way your tracker closes work, which works fully offline against a local markdown tracker.
 
 Implementers talk to the orchestrator through [context pointers](https://www.aihero.dev/ai-coding-dictionary/context-pointer) (the spec, the ticket, shared exploration notes, earlier commits) rather than pasted summaries, which keeps each subagent's prompt small and the orchestrator's window free for the graph.
+
+## Acceptance belongs to the integrated feature
+
+Each implementer runs its focused checks and reports missing verification. The orchestrator runs the applicable full suite and accepts the combined feature after all ticket implementations land. It owns one report under `docs/test-reports/`, so separate tickets do not each start a whole-spec E2E run.
+
+| Combined change | What runs |
+| --- | --- |
+| HTTP behavior, web interaction, native functionality or a user-visible fix | E2E for affected journeys and the spec's required targets |
+| Documentation, formatting or internal refactoring without observable behavior changes | Appropriate existing checks; new E2E only if agreed criteria require it |
+| Required skill, device, account or tooling missing | A blocked report; the draft PR and affected tickets stay unresolved |
+
+Acceptance fixes are committed before review. Review fixes are merged back and checked on the integration branch; changes affecting behavior trigger focused E2E retests in the same report. The report retains earlier failures and identifies which revision was tested. A saved branch or completed report is not proof that acceptance passed.
 
 ## Common questions
 
@@ -41,11 +53,11 @@ This is the question the skill exists to answer. Before it shipped, people kept 
 
 **Does it need GitHub? I want it to stop at the branch.**
 
-No, not any more. One user who liked the in-progress version had exactly this complaint: "it creates a PR at the end, which requires an online repository like GitHub. I wish it could do the same work offline and stop at the branch where all the work is merged." The goal is now the integration branch. A PR opens only when the configured tracker closes work through PRs or you ask for one, so on a local markdown tracker the run ends with every ticket resolved and the work merged on the branch.
+No, not any more. One user who liked the in-progress version had exactly this complaint: "it creates a PR at the end, which requires an online repository like GitHub. I wish it could do the same work offline and stop at the branch where all the work is merged." The goal is now the integration branch. A PR opens only when the configured tracker closes work through PRs or you ask for one, so on a local markdown tracker a successful run ends with tickets resolved and work merged on the branch. Required verification blockers leave affected tickets unresolved.
 
 **Its review and fix loop ran for hours, or kept "fixing" tickets that hadn't been built yet.**
 
-Both come from `code-review` running outside the one slot the skill gives it. It compares the code against the whole spec, so it only makes sense once every ticket has landed; run it mid-run and every unbuilt ticket reads as a failure, the agent sets about building it, and that triggers another review. At the end, the skill runs `code-review` once and sends every finding to one fix subagent, but it doesn't yet say when to stop after that fix. One user reported a five-ticket feature where "the review and fix loop took roughly four hours". If you see a second broad review start, tell it to run focused checks for the fixed findings and stop. Expect that first review to find real problems: the run's output is a draft that the review finishes, not something to ship on its own.
+Both come from `code-review` running outside the one slot the skill gives it. It compares the code against the whole spec, so it only makes sense once every ticket has landed; run it mid-run and every unbuilt ticket reads as a failure, the agent sets about building it, and that triggers another review. At the end, the skill runs `code-review` once and sends its in-scope findings to one fix subagent. It then verifies those findings with focused checks and reruns affected acceptance cases in the existing report, rather than automatically starting another broad review. Unresolved findings or failed required checks prevent close-out.
 
 **Does it drive tdd like implement does?**
 
@@ -65,7 +77,7 @@ No. People ask because the skills now reach into implementation: "is Sandcastle 
 
 **A ticket's key test was skipped inside its worktree, and it reported green.**
 
-A worktree holds only what git tracks. Tests that read gitignored fixtures, local databases, or credentials can skip themselves there silently. For a ticket whose verification depends on untracked material, tell the orchestrator to run it in the main checkout instead.
+A worktree holds only what git tracks. Tests that read gitignored fixtures, local databases, or credentials can skip themselves there silently. Report missing prerequisites explicitly and arrange the required fixtures or credentials in the authorized integration test environment. A skipped required case cannot count as acceptance passed, and the workflow must not switch to an unrelated checkout and validate a different build.
 
 ## It's working if
 
@@ -73,7 +85,9 @@ A worktree holds only what git tracks. Tests that read gitignored fixtures, loca
 - A ticket starts as soon as its last blocker lands on the integration branch, not when the whole run ends.
 - Every ticket's trace shows `tdd` running, with a failing test before the code.
 - Merges into the integration branch are fast-forwards, not conflict resolutions.
-- The run ends on one branch with every ticket resolved, and a PR only if your tracker wanted one.
+- When E2E is required, one integration report shows the journeys, targets and review-triggered retests.
+- Required skipped or blocked checks keep the PR draft and affected tickets open.
+- A successful run ends on one branch with tickets resolved, and a PR only if your tracker wanted one.
 
 ## Where it fits
 
@@ -83,4 +97,4 @@ A worktree holds only what git tracks. Tests that read gitignored fixtures, loca
 grill-with-docs → to-spec → to-tickets → implement-spec → retro
 ```
 
-Its neighbours are [to-tickets](https://aihero.dev/skills-to-tickets), which declares the blocking edges it reads as a task graph, and [code-review](https://aihero.dev/skills-code-review), which it runs over the integration branch before closing out. [ask-matt](https://aihero.dev/skills-ask-matt) is the router over the whole set when you are not sure which flow you are in.
+Its neighbours are [to-tickets](https://aihero.dev/skills-to-tickets), which declares the blocking edges it reads as a task graph; [e2e-testing](https://aihero.dev/skills-e2e-testing), which accepts the integrated feature; and [code-review](https://aihero.dev/skills-code-review), which reviews the committed result before close-out. [ask-matt](https://aihero.dev/skills-ask-matt) is the router over the whole set when you are not sure which flow you are in.

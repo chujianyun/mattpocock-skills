@@ -7,6 +7,8 @@ description: Verify implemented features through HTTP APIs, web browsers, and ma
 
 **Acceptance** means an observed business outcome on the declared targets. A working API does not prove the UI exists; a browser preview does not prove the packaged app works. Deliver repeatable tests and one evidence-backed report, including when execution is blocked.
 
+When called by an implementation workflow, reuse its agreed criteria, affected targets and existing report path. Return acceptance results and repair evidence to the caller; it owns code review, commits and task close-out. Review-triggered retests continue the same report on the changed build. Do not call the implementation workflow back.
+
 ## 1. Declare the acceptance boundary
 
 Read the feature requirements, relevant implementation and existing tests. Read `GLOSSARY.md` and relevant ADRs when present. Identify the actual user entry point, expected outcomes and build under test.

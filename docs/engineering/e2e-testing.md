@@ -41,7 +41,7 @@ Mobile web emulation, native simulators/emulators and physical devices are separ
 
 The report lives in the tested project's `docs/test-reports/`, with local, relative links to screenshots and sanitized evidence. It maps acceptance criteria to cases and platforms, records the tested build, shows actual commands and outcomes, and names unverified work. Counts distinguish cases from retry attempts and repairs from unchanged retries.
 
-Product defects enter the `diagnosing-bugs` repair loop when that skill is available. The caller's report is reused, so reproduction, repair and acceptance retesting stay together. A standalone bug-fix task still uses its own bugfix report. If the repair skill is unavailable, a small reproduction, diagnosis, repair and retest loop remains available here.
+Product defects enter the `diagnosing-bugs` repair loop when that skill is available. The caller's report is reused, so reproduction, repair and acceptance retesting stay together. When an implementation workflow calls this skill, it supplies the agreed criteria and required targets; review-triggered retests continue that report on the changed build. The caller owns commits, review and task close-out. A standalone bug-fix task still uses its own bugfix report. If the repair skill is unavailable, a small reproduction, diagnosis, repair and retest loop remains available here.
 
 ## Common questions
 
@@ -67,4 +67,4 @@ It fixes defects within the agreed acceptance scope, preserving failure evidence
 
 ## Where it fits
 
-`e2e-testing` is a reach-for-it-anytime standalone for feature acceptance, typically after runnable behavior exists. It does not add a mandatory stage to `implement`. [tdd](https://aihero.dev/skills-tdd) supplies the development feedback loop; [diagnosing-bugs](https://aihero.dev/skills-diagnosing-bugs) supplies deeper repair discipline when acceptance exposes a defect. [ask-matt](https://aihero.dev/skills-ask-matt) routes feature-verification requests here.
+`e2e-testing` works independently and as a conditional acceptance step in [implement](https://aihero.dev/skills-implement) and [implement-spec](https://aihero.dev/skills-implement-spec). Changed HTTP, web or native behavior and user-visible fixes trigger it; documentation and behavior-preserving refactoring use appropriate existing checks unless the agreed criteria require E2E. Whole-spec implementation accepts the integrated feature once the tickets have landed, then retests affected cases after review fixes. [tdd](https://aihero.dev/skills-tdd) supplies the development feedback loop; [diagnosing-bugs](https://aihero.dev/skills-diagnosing-bugs) supplies deeper repair discipline when acceptance exposes a defect. [ask-matt](https://aihero.dev/skills-ask-matt) routes feature-verification requests here.
