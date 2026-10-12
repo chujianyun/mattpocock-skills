@@ -6,6 +6,8 @@ disable-model-invocation: true
 
 Implement the work described by the user in the spec, tickets or agreed conversation plan. Preserve that scope and its acceptance criteria. Record the starting commit as the review base unless the user supplied another fixed point; keep unrelated work out of task commits.
 
+If the user passes a ticket reference, fetch it from the issue tracker and state its title before starting. If the reference is ambiguous, ask.
+
 Call the Skill tool with "tdd" where possible, at pre-agreed seams. Run typechecking and focused tests regularly, then the full applicable test suite once the implementation is ready.
 
 ## Accept the affected behavior
