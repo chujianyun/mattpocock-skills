@@ -1,5 +1,29 @@
 # mattpocock-skills
 
+## 1.4.0
+
+### Minor Changes
+
+- [`7ed57bd`](https://github.com/mattpocock/skills/commit/7ed57bd3d0005e9e149a174c3f998da2da59ce0a) Thanks [@chujianyun](https://github.com/chujianyun)! - Add **`e2e-testing`**, a model-invoked Engineering skill for feature acceptance through HTTP, web, Electron and native macOS, iOS and Android apps. It reuses existing suites, repairs in-scope defects and delivers one Markdown report with per-target execution evidence and explicit coverage limits.
+
+  Allow **`diagnosing-bugs`** to reuse a calling workflow's report and evidence layout while preserving its repair evidence requirements. Standalone repairs retain the existing bugfix-report location. Register the new skill in the plugin, documentation, indexes and `ask-matt` router.
+
+- [`a4c4b49`](https://github.com/mattpocock/skills/commit/a4c4b4950b855f66e7a733aca9c88ac15f68b9fb) Thanks [@chujianyun](https://github.com/chujianyun)! - Compose **`e2e-testing`** into **`implement`** and **`implement-spec`** for changed HTTP, web and native behavior and user-visible fixes. Scope acceptance to agreed targets, reuse one report through repairs and review-triggered retests, and keep required verification blockers visible at close-out. Whole-spec acceptance runs on the integrated result rather than once per ticket.
+
+  Checkpoint implementation and acceptance fixes before committed-diff review, then verify and commit review fixes. Keep independent E2E invocation available and synchronize the workflow documentation and router.
+
+### Patch Changes
+
+- [#1363](https://github.com/mattpocock/skills/pull/1363) [`5ae4816`](https://github.com/mattpocock/skills/commit/5ae481693d13b37d4d2c2c92d0b66d299c93e695) Thanks [@mattpocock](https://github.com/mattpocock)! - `chief-of-staff` now looks for a shared wiki before starting its own. It also runs `retro` on about one in five of its subagents' sessions, the ones where something went wrong first, and acts on the findings itself, and runs `to-spec`, `to-tickets` and `implement-spec` for large chunks of work, reading each skill by relative path so they can stay user-invoked.
+
+- [`c11109c`](https://github.com/mattpocock/skills/commit/c11109ce21b01783f38e2d2ececcabc1a12a2794) Thanks [@chujianyun](https://github.com/chujianyun)! - Clarify `diagnosing-bugs` repair and report completion separately, including blocked tasks and unavailable Markdown previews. Keep consultation outside the repair-delivery checklist, defer the detailed template until report writing, and allow concise reports for small fixes.
+
+- [`59b468e`](https://github.com/mattpocock/skills/commit/59b468ebd31f23c8cc3de354b08350466614c309) Thanks [@chujianyun](https://github.com/chujianyun)! - Require one Markdown test report per bug-fix task handled by `diagnosing-bugs`, including blocked repairs. Capture real before-and-after evidence when available, embed local screenshots with portable relative paths, and preserve sanitized evidence through cleanup. Add a reusable Chinese report template and document the reporting boundary and delivery checks.
+
+- [#1342](https://github.com/mattpocock/skills/pull/1342) [`a496f55`](https://github.com/mattpocock/skills/commit/a496f5513d4a4cf889bc48e189e579f4b0bdf6aa) Thanks [@mattpocock](https://github.com/mattpocock)! - `implement-spec` now uses a fresh implementer subagent for each ticket and for the code-review fixes, instead of reusing an earlier implementer.
+
+- [#1316](https://github.com/mattpocock/skills/pull/1316) [`4ae2317`](https://github.com/mattpocock/skills/commit/4ae2317ddb22b046e26455e4f9c9b3aaaf62212d) Thanks [@mattpocock](https://github.com/mattpocock)! - Add `software-factory`, an in-progress user-invoked reference skill: a glossary for designing a software factory (tasks, runs, runners, triggers, and the services they plug into), example tasks grouped by the problem they solve, surveys of the products that fill each slot (ticket trackers, git hosts, runners, observability platforms), and the questions that finish a design. Call it alongside a grilling session.
+
 ## 1.3.2
 
 ### Patch Changes
