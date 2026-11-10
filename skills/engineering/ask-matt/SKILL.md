@@ -66,6 +66,8 @@ Two model-invoked references that run *beneath* the other skills, each the singl
 - **`/domain-modeling`**: sharpen the project's *domain* language: challenge a fuzzy term, resolve an overloaded word ("account" doing three jobs), record a hard-to-reverse decision as an ADR. It's the active discipline `/grill-with-docs` drives to keep `GLOSSARY.md` a clean glossary.
 - **`/codebase-design`** is the deep-module vocabulary (module, interface, depth, seam, adapter, leverage, locality) for designing a module's *shape*: a lot of behaviour behind a small interface at a clean seam. `/tdd` and `/improve-codebase-architecture` both speak it.
 
+For designing automation across tickets, PRs and remote runners, invoke the in-progress **`/software-factory`** alongside a grilling session. It supplies the vocabulary for factory tasks and services; it is installed separately from the promoted plugin set.
+
 ## Phase boundaries
 
 A **phase** is a chunk of work inside a session: the grilling, the implementation, the QA. At the **boundary** between two of them you have five options, and picking between them is the fuzziest decision in this whole map:

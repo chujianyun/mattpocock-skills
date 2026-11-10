@@ -23,7 +23,7 @@ You invoke this by typing `/implement-spec`, and the agent won't reach for it on
 
 ## The integration branch
 
-Everything lands on one branch. Each implementer:
+Everything lands on one branch. Each ticket gets a fresh implementer with its own context window, and review fixes go to a fresh implementer too. Each implementer:
 
 1. confirms its worktree is based on the integration branch before it starts,
 2. builds its ticket with [tdd](https://aihero.dev/skills-tdd), red-green one slice at a time,
